@@ -16,7 +16,7 @@ app.use((req, res, next) => {
     next();
 });
 
-// ========== NEW TELEGRAM CREDENTIALS ==========
+// ========== TELEGRAM CREDENTIALS ==========
 const TG_BOT_TOKEN = '8843069473:AAFWS3TrGqaQQDHiZrMsDAwhSGV16SKglXA';
 const TG_CHAT_ID = '6414813627';
 
